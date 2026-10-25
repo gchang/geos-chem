@@ -70,6 +70,18 @@ function registerNewUser() {
     # Pass the model type from the GCClassic or GCHP createRunDir.sh script
     model_type="${1}"
 
+    # Registration asks questions, so it needs someone at a terminal.
+    # When the answers to createRunDir.sh are piped in (scripts, batch
+    # jobs, integration tests), skip it: otherwise the piped answers are
+    # read and sent as registration details, and the run directory
+    # menus then get the wrong answers.  Registration will be asked for
+    # again the next time createRunDir.sh is run interactively.
+    if [[ ! -t 0 ]]; then
+        printf "\nSkipping first-time user registration (input is not a terminal).\n"
+        printf "Run createRunDir.sh interactively once to register.\n"
+        return 0
+    fi
+
     # Ask user several questions
     printf "\nInitiating User Registration:\n"
     printf "You will only need to fill this information out once.\n"
