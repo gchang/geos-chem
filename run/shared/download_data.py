@@ -307,7 +307,12 @@ def get_remote_restart_filename(local_prefix, run_info, rst_info):
     simulation = run_info["sim"].lower()
 
     # Remote restart file directory
-    root = os.path.join(local_prefix, "ExtData", rst_info["root"])
+    # (local_prefix already ends in ExtData for portals that have no
+    # ExtData folder, see extract_pathnames_from_log)
+    if "ExtData" in local_prefix:
+        root = os.path.join(local_prefix, rst_info["root"])
+    else:
+        root = os.path.join(local_prefix, "ExtData", rst_info["root"])
 
     # Special handling for fullchem
     if "fullchem" in simulation:
