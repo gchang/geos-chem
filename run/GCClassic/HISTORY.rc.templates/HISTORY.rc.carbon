@@ -1,0 +1,365 @@
+###############################################################################
+###  HISTORY.rc file for GEOS-Chem carbon simulation                        ###
+###  Contact: GEOS-Chem Support Team (geos-chem-support@g.harvard.edu)      ###
+###############################################################################
+
+#============================================================================
+# EXPID allows you to specify the beginning of the file path corresponding
+# to each diagnostic collection.  For example:
+#
+#   EXPID: ./GEOSChem
+#      Will create netCDF files whose names begin "GEOSChem",
+#      in this run directory.
+#
+#   EXPID: ./OutputDir/GEOSChem
+#      Will create netCDF files whose names begin with "GEOSChem"
+#      in the OutputDir sub-folder of this run directory.
+#
+#============================================================================
+EXPID:  ./OutputDir/GEOSChem
+
+#==============================================================================
+# %%%%% COLLECTION NAME DECLARATIONS %%%%%
+#
+# To enable a collection, remove the "#" character in front of its name. The
+# Restart collection should always be turned on.
+#
+# NOTE: These are the "default" collections for GEOS-Chem, but you can create
+# your own customized diagnostic collections as well.
+#==============================================================================
+COLLECTIONS: 'Restart',
+             'SpeciesConc',
+             #'Budget',
+             #'CloudConvFlux',
+             #'ConcAfterChem',
+             #'KppDiags',
+             'ProdLoss',
+             #'RxnConst',
+             #'RxnRates',
+             #'SatDiagn',
+             #'SatDiagnEdge',
+             'StateMet',
+             'StateMetLevEdge',
+             #'BoundaryConditions',
+::
+###############################################################################
+### The rest of this file consists of collection definitions.               ###
+### Above collections whose declarations are commented out will be ignored. ###
+### Make sure that each collection definition, as well as the list of       ###
+### collections above, ends with a double-colon ("::").                     ###
+###############################################################################
+
+#==============================================================================
+# %%%%% THE Restart COLLECTION %%%%%
+#
+# GEOS-Chem restart file fields
+#==============================================================================
+  Restart.filename:           './Restarts/GEOSChem.Restart.%y4%m2%d2_%h2%n2z.nc4',
+  Restart.frequency:          ${RUNDIR_HIST_TIME_AVG_FREQ},
+  Restart.duration:           ${RUNDIR_HIST_TIME_AVG_FREQ},
+  Restart.mode:               'instantaneous'
+  Restart.fields:             'SpeciesRst_?ALL?               ',
+                              'Met_DELPDRY                    ',
+                              'Met_BXHEIGHT                   ',
+                              'Met_TropLev                    ',
+::
+#==============================================================================
+# %%%%% THE SpeciesConc COLLECTION %%%%%
+#
+# GEOS-Chem species concentrations (default = all species)
+#
+# Concentrations may be saved out as SpeciesConcVV  [v/v dry air] or
+#                                    SpeciesConcMND [molec/cm3]
+#==============================================================================
+  SpeciesConc.template:       '%y4%m2%d2_%h2%n2z.nc4',
+  SpeciesConc.frequency:      ${RUNDIR_HIST_TIME_AVG_FREQ}
+  SpeciesConc.duration:       ${RUNDIR_HIST_TIME_AVG_DUR}
+  SpeciesConc.mode:           'time-averaged'
+  SpeciesConc.fields:         'SpeciesConcVV_?ALL?           ',
+                              #'SpeciesConcMND_?ALL?          ',
+::
+#==============================================================================
+# %%%%% THE Budget COLLECTION %%%%%
+#
+# GEOS-Chem budget diagnostics defined as species kg/s in the column
+# (full, troposphere, or PBL) due to a single component (e.g. chemistry)
+# (default = advected species)
+#==============================================================================
+  Budget.template:     '%y4%m2%d2_%h2%n2z.nc4',
+  Budget.frequency:    ${RUNDIR_HIST_TIME_AVG_FREQ}
+  Budget.duration:     ${RUNDIR_HIST_TIME_AVG_DUR}
+  Budget.mode:         'time-averaged'
+  Budget.fields:       'BudgetEmisDryDepFull_?ADV?           ',
+                       'BudgetEmisDryDepTrop_?ADV?           ',
+                       'BudgetEmisDryDepPBL_?ADV?            ',
+                       'BudgetEmisDryDepLevs1to35_?ADV?      ',
+                       'BudgetChemistryFull_?ADV?            ',
+                       'BudgetChemistryTrop_?ADV?            ',
+                       'BudgetChemistryPBL_?ADV?             ',
+                       'BudgetChemistryLevs1to35_?ADV?       ',
+                       'BudgetTransportFull_?ADV?            ',
+                       'BudgetTransportTrop_?ADV?            ',
+                       'BudgetTransportPBL_?ADV?             ',
+                       'BudgetTransportLevs1to35_?ADV?       ',
+                       'BudgetMixingFull_?ADV?               ',
+                       'BudgetMixingTrop_?ADV?               ',
+                       'BudgetMixingPBL_?ADV?                ',
+                       'BudgetMixingLevs1to35_?ADV?          ',
+                       'BudgetConvectionFull_?ADV?           ',
+                       'BudgetConvectionTrop_?ADV?           ',
+                       'BudgetConvectionPBL_?ADV?            ',
+                       'BudgetConvectionLevs1to35_?ADV?      ',
+::
+#==============================================================================
+# %%%%% THE CloudConvFlux COLLECTION %%%%%
+#
+# Cloud convective flux (default = advected species)
+#==============================================================================
+  CloudConvFlux.template:     '%y4%m2%d2_%h2%n2z.nc4',
+  CloudConvFlux.frequency:    ${RUNDIR_HIST_TIME_AVG_FREQ}
+  CloudConvFlux.duration:     ${RUNDIR_HIST_TIME_AVG_DUR}
+  CloudConvFlux.mode:         'time-averaged'
+  CloudConvFlux.fields:       'CloudConvFlux_?ADV?           ',
+::
+#==============================================================================
+# %%%%% THE KppDiags COLLECTION %%%%%
+#
+# Diagnostics from the KPP solver.
+#
+# NOTE: The carbon simulation uses the Forward Euler (feuler) solver, which
+# has no internal timestepping loop.  Therefore many of these diagnostics
+# will have little or no variation across grid boxes.
+#==============================================================================
+  KppDiags.template:          '%y4%m2%d2_%h2%n2z.nc4',
+  KppDiags.frequency:         ${RUNDIR_HIST_TIME_AVG_FREQ}
+  KppDiags.duration:          ${RUNDIR_HIST_TIME_AVG_DUR}
+  KppDiags.mode:              'time-averaged'
+  KppDiags.fields:            'KppIntCounts                  ',
+                              'KppJacCounts                  ',
+                              'KppTotSteps                   ',
+                              'KppAccSteps                   ',
+                              'KppRejSteps                   ',
+                              'KppLuDecomps                  ',
+                              'KppSubsts                     ',
+                              'KppSmDecomps                  ',
+                              'KppTime                       ',
+::
+#==============================================================================
+# %%%%% THE ProdLoss COLLECTION %%%%%
+#
+# Production and loss fields from the carbon simulation via KPP
+#==============================================================================
+  ProdLoss.template:         '%y4%m2%d2_%h2%n2z.nc4',
+  ProdLoss.frequency:        ${RUNDIR_HIST_TIME_AVG_FREQ}
+  ProdLoss.duration:         ${RUNDIR_HIST_TIME_AVG_DUR}
+  ProdLoss.mode:             'time-averaged'
+  ProdLoss.fields:           'ProdCOfromCH4                  ',
+                             'ProdCOfromNMVOC                ',
+                             'ProdCO2fromCO                  ',
+::
+#==============================================================================
+# %%%%% THE RxnConst COLLECTION %%%%%
+#
+# Archives chemical reaction rates constants from the KPP solver.
+# It is best to list individual reactions to avoid using too much memory.
+# Reactions should be listed as "RxnConst_EQnnnn", where nnnn is the reaction
+# index as listed in KPP/fullchem/gckpp_Monitor.F90 (pad zeroes as needed).
+#
+# The units of reaction rate constants vary according to the number of
+# reactants in the reaction.
+#==============================================================================
+  RxnConst.template:          '%y4%m2%d2_%h2%n2z.nc4',
+  RxnConst.frequency:         ${RUNDIR_HIST_TIME_AVG_FREQ}
+  RxnConst.duration:          ${RUNDIR_HIST_TIME_AVG_DUR}
+  RxnConst.mode:              'time-averaged'
+  RxnConst.fields:            'RxnConst_EQ0001                ',
+                              'RxnConst_EQ0002                ',
+                              'RxnConst_EQ0003                ',
+                              'RxnConst_EQ0004                ',
+                              'RxnConst_EQ0005                ',
+                              'RxnConst_EQ0006                ',
+                              'RxnConst_EQ0007                ',
+                              'RxnConst_EQ0008                ',
+::
+#==============================================================================
+# %%%%% THE RxnRates COLLECTION %%%%%
+#
+# Archives chemical reaction rates from the KPP solver.
+# It is best to list individual reactions to avoid using too much memory.
+# Reactions should be listed as "RxnRate_EQnnnn", where nnnn is the reaction
+# index as listed in KPP/fullchem/gckpp_Monitor.F90 (pad zeroes as needed).
+#==============================================================================
+  RxnRates.template:          '%y4%m2%d2_%h2%n2z.nc4',
+  RxnRates.frequency:         ${RUNDIR_HIST_TIME_AVG_FREQ}
+  RxnRates.duration:          ${RUNDIR_HIST_TIME_AVG_DUR}
+  RxnRates.mode:              'time-averaged'
+  RxnRates.fields:            'RxnRate_EQ0001                 ',
+                              'RxnRate_EQ0002                 ',
+                              'RxnRate_EQ0003                 ',
+                              'RxnRate_EQ0004                 ',
+                              'RxnRate_EQ0005                 ',
+                              'RxnRate_EQ0006                 ',
+                              'RxnRate_EQ0007                 ',
+                              'RxnRate_EQ0008                 ',
+::
+#==============================================================================
+# %%%%% THE SatDiagn COLLECTION %%%%%
+#
+# GEOS-Chem data during satellite overpass
+#==============================================================================
+  SatDiagn.template:          '%y4%m2%d2_%h2%n2z.nc4',
+  SatDiagn.format:            'CFIO',
+  SatDiagn.frequency:         00000001 000000
+  SatDiagn.duration:          00000100 000000
+  SatDiagn.hrrange:           11.98 15.02
+  SatDiagn.mode:              'time-averaged'
+  SatDiagn.fields:            'SatDiagnConc_CH4               ',
+                              'SatDiagnConc_CO                ',
+                              'SatDiagnConc_CO2               ',
+                              'SatDiagnConc_OCS               ',
+                              'SatDiagnOH                     ',
+                              'SatDiagnRH                     ',
+                              'SatDiagnAirDen                 ',
+                              'SatDiagnBoxHeight              ',
+                              'SatDiagnTROPP                  ',
+                              'SatDiagnPBLHeight              ',
+                              'SatDiagnPBLTop                 ',
+                              'SatDiagnPBLTOPL                ',
+                              'SatDiagnPMID                   ',
+                              'SatDiagnMODISLAI               ',
+                              'SatDiagnColEmis_CH4            ',
+                              'SatDiagnSurfFlux_CH4           ',
+::
+#==============================================================================
+# %%%%% THE SatDiagnEdge COLLECTION %%%%%
+#
+# GEOS-Chem data (on level edges) during satellite overpass
+#==============================================================================
+  SatDiagnEdge.template:      '%y4%m2%d2_%h2%n2z.nc4',
+  SatDiagnEdge.format:        'CFIO',
+  SatDiagnEdge.frequency:     00000001 000000
+  SatDiagnEdge.duration:      00000100 000000
+  SatDiagnEdge.hrrange:       11.98 15.02
+  SatDiagnEdge.mode:          'time-averaged'
+  SatDiagnEdge.fields:        'SatDiagnPEDGE                  ',
+::
+#==============================================================================
+# %%%%% The StateMet COLLECTION %%%%%
+#
+# Fields of the State_Met object (also see the StateMetLevEdge collection)
+#==============================================================================
+  StateMet.template:          '%y4%m2%d2_%h2%n2z.nc4',
+  StateMet.frequency:         ${RUNDIR_HIST_TIME_AVG_FREQ}
+  StateMet.duration:          ${RUNDIR_HIST_TIME_AVG_DUR}
+  StateMet.mode:              'time-averaged'
+  StateMet.fields:            'Met_AD                        ',
+                              'Met_AIRDEN                    ',
+                              'Met_AIRVOL                    ',
+                              'Met_ALBD                      ',
+                              'Met_AVGW                      ',
+                              'Met_BXHEIGHT                  ',
+                              'Met_ChemGridLev               ',
+                              'Met_CLDF                      ',
+                              'Met_CLDFRC                    ',
+                              'Met_CLDTOPS                   ',
+                              'Met_DELP                      ',
+                              'Met_DQRCU                     ',
+                              'Met_DQRLSAN                   ',
+                              'Met_DTRAIN                    ',
+                              'Met_EFLUX                     ',
+                              'Met_FRCLND                    ',
+                              'Met_FRLAKE                    ',
+                              'Met_FRLAND                    ',
+                              'Met_FRLANDICE                 ',
+                              'Met_FROCEAN                   ',
+                              'Met_FRSEAICE                  ',
+                              'Met_FRSNOW                    ',
+                              'Met_GWETROOT                  ',
+                              'Met_GWETTOP                   ',
+                              'Met_HFLUX                     ',
+                              'Met_LAI                       ',
+                              'Met_PARDR                     ',
+                              'Met_PARDF                     ',
+                              'Met_PBLTOPL                   ',
+                              'Met_PBLH                      ',
+                              'Met_PHIS                      ',
+                              'Met_PMID                      ',
+                              'Met_PMIDDRY                   ',
+                              'Met_PRECANV                   ',
+                              'Met_PRECCON                   ',
+                              'Met_PRECLSC                   ',
+                              'Met_PRECTOT                   ',
+                              'Met_PS1DRY                    ',
+                              'Met_PS1WET                    ',
+                              'Met_PS2DRY                    ',
+                              'Met_PS2WET                    ',
+                              'Met_PSC2WET                   ',
+                              'Met_PSC2DRY                   ',
+                              'Met_QI                        ',
+                              'Met_QL                        ',
+                              'Met_OMEGA                     ',
+                              'Met_OPTD                      ',
+                              'Met_REEVAPCN                  ',
+                              'Met_REEVAPLS                  ',
+                              'Met_SLP                       ',
+                              'Met_SNODP                     ',
+                              'Met_SNOMAS                    ',
+                              'Met_SPHU                      ',
+                              'Met_SPHU1                     ',
+                              'Met_SPHU2                     ',
+                              'Met_SUNCOS                    ',
+                              'Met_SUNCOSmid                 ',
+                              'Met_SWGDN                     ',
+                              'Met_T                         ',
+                              'Met_TAUCLI                    ',
+                              'Met_TAUCLW                    ',
+                              'Met_THETA                     ',
+                              'Met_TMPU1                     ',
+                              'Met_TMPU2                     ',
+                              'Met_TO3                       ',
+                              'Met_TropHt                    ',
+                              'Met_TropLev                   ',
+                              'Met_TropP                     ',
+                              'Met_TS                        ',
+                              'Met_TSKIN                     ',
+                              'Met_TV                        ',
+                              'Met_U                         ',
+                              'Met_U10M                      ',
+                              'Met_USTAR                     ',
+                              'Met_UVALBEDO                  ',
+                              'Met_V                         ',
+                              'Met_V10M                      ',
+                              'Met_Z0                        ',
+::
+#==============================================================================
+# %%%%% THE StateMetLevEdge COLLECTION %%%%%
+#
+# Diagnostics that are defined on grid box level edges
+#==============================================================================
+  StateMetLevEdge.template:    '%y4%m2%d2_%h2%n2z.nc4',
+  StateMetLevEdge.frequency:   ${RUNDIR_HIST_TIME_AVG_FREQ}
+  StateMetLevEdge.duration:    ${RUNDIR_HIST_TIME_AVG_DUR}
+  StateMetLevEdge.mode:        'time-averaged'
+  StateMetLevEdge.fields:      'Met_PEDGE                     ',
+                               #'Met_CMFMC                     ',
+                               #'Met_PEDGEDRY                  ',
+                               #'Met_PFICU                     ',
+                               #'Met_PFILSAN                   ',
+                               #'Met_PFLCU                     ',
+                               #'Met_PFLLSAN                   ',
+::
+#==============================================================================
+# %%%%% THE BoundaryConditions COLLECTION %%%%%
+#
+# GEOS-Chem boundary conditions for use in nested grid simulations
+#
+# NOTE: Do not change the BoundaryConditions.frequency setting below,
+# because GEOS-Chem nested-grid simulations expect to read boundary
+# condition data at 3 hour intervals.
+#==============================================================================
+  BoundaryConditions.template:   '%y4%m2%d2_%h2%n2z.nc4',
+  BoundaryConditions.frequency:  00000000 030000
+  BoundaryConditions.duration:   00000001 000000
+  BoundaryConditions.mode:       'instantaneous'
+  BoundaryConditions.fields:     'SpeciesBC_?ADV?             ',
+::
